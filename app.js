@@ -67,6 +67,7 @@ aedes.on('publish', async function (packet, client) {
         // console.log(packet.payload.toString())
 
         saveMqttUpdate({
+            timestamp: new Date(),
             topic: packet.topic.toString(),
             device_name: packet.topic.toString(),
             reading: JSON.parse(packet.payload.toString())
@@ -89,10 +90,18 @@ express_server.get('/sensor_data/:device_name', (req, res) => {
     let device_name = req.params.device_name
     console.log(device_name);
 
-    let condition_json = { "device_name": device_name }
-    MqttMsg.findOne(condition_json, (err, reading) => {
+    let condition_json = {
+        "device_name": device_name,
+    };
+
+    MqttMsg.findOne(condition_json, {}, {
+        sort: {
+            timestamp: -1
+        }
+    }, (err, reading) => {
 
         // {
+        //     timestamp :  Date().now
         //     sensor_model: "DHT22",
         //     sensor_data : {
         //             "temperature" : 27.7,

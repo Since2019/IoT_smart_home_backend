@@ -12,6 +12,7 @@ const ReadingSchema = new Schema({
 
 // MqttMsgSchema
 const MqttMsgSchema = new Schema({
+    timestamp: Date,
     topic: String,
     device_name: String,
     reading: ReadingSchema,      //Array with a type of "ReadingSchema"
@@ -57,7 +58,7 @@ async function saveMqttUpdate(mqtt_json) {
         let mqtt_msg = new MqttMsg(
             mqtt_json
         )
-
+        // console.log(mqtt_json)
         mqtt_msg.save((err, doc) => {
             console.log("saving readings");
             err && console.log(err);
