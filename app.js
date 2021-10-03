@@ -13,7 +13,7 @@ const {
     connectMongoose,
     saveMqttUpdate,
     MqttMsg,
-    DevicInfo
+    DeviceInfo
 } = require('./utils/mongo/mongoHandler')
 
 
@@ -85,7 +85,7 @@ aedes.on('publish', async function (packet, client) {
 
                 // `doc` is the document _after_ `update` was applied because of
                 // `new: true`
-                let doc = await DevicInfo.findOneAndUpdate(filter, update, {
+                let doc = await DeviceInfo.findOneAndUpdate(filter, update, {
                     new: true,
                     upsert: true // Make this update into an upsert
                 });
@@ -127,7 +127,7 @@ express_server.get('/sensor_data/:device_name', (req, res) => {
     };
 
 
-    DevicInfo.findOne(condition_json, async (err, result) => {
+    DeviceInfo.findOne(condition_json, async (err, result) => {
         // the list of sensors
         let sensors = result.sensors;
         let ret_obj = [];
