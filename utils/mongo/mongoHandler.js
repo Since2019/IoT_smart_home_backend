@@ -19,10 +19,18 @@ const MqttMsgSchema = new Schema({
 
 }, { collection: 'mqtt_data' });
 
+// DevicInfoSchema
+const DeviceInfoSchema = new Schema({
+    device_name: String,    //same as topic name, the way to do the query
+    sensors: [String],
+}, { collection: 'smart_devices' });
+
+
 
 // 按照Schema创建model
 const MqttMsg = mongoose.model('MqttMsg', MqttMsgSchema);
 const Reading = mongoose.model('Reading', ReadingSchema);
+const DeviceInfo = mongoose.model('DeviceInfo', DeviceInfoSchema)
 
 function connectMongoose() {
 
@@ -76,6 +84,7 @@ async function saveMqttUpdate(mqtt_json) {
 module.exports = {
     connectMongoose, // 连接服务器
     saveMqttUpdate,  // 保存数据到服务器
-    MqttMsg
+    MqttMsg,
+    DeviceInfo
 
 };
