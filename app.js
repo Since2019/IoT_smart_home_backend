@@ -19,7 +19,6 @@ const {
 
 connectMongoose()
 
-
 express_server.use(cors())
 
 
@@ -31,6 +30,9 @@ aedes_server.listen(AEDES_PORT, function () {
 })
 
 aedes.on('subscribe', function (subscriptions, client) {
+    aedes.publish({ "topic": "wemos-room-monitor-02", "payload": "test ${aedes.id}" });
+
+    console.log("On subscribe ==== ")
     console.log('MQTT client \x1b[32m' + (client ? client.id : client) +
         '\x1b[0m subscribed to topics: ' + subscriptions.map(s => s.topic).join('\n'), 'from broker', aedes.id)
 })
@@ -42,10 +44,11 @@ aedes.on('subscribe', function (subscriptions, client) {
 // })
 
 
-// aedes.on('client', function (client) {
-//     // console.log('Client Connected: \x1b[33m' + (client ? client.id : client) + '\x1b[0m', 'to broker', aedes.id)
-//     console.log((client ? client.id : client), aedes.id)
-// })
+aedes.on('client', function (client) {
+    console.log('on client = = = = = = = = = = = = ')
+    console.log('Client Connected: \x1b[33m' + (client ? client.id : client) + '\x1b[0m', 'to broker', aedes.id)
+    console.log((client ? client.id : client), aedes.id)
+})
 
 
 aedes.on('clientDisconnect', function (client) {
@@ -53,6 +56,10 @@ aedes.on('clientDisconnect', function (client) {
     console.log((client ? client.id : client), aedes.id)
 })
 
+
+
+
+let client_array = []
 
 /**
  *  aedes.on('publish' , CALLBACK){
@@ -64,6 +71,13 @@ aedes.on('clientDisconnect', function (client) {
  */
 // MQTT 将收到的信息转换成 JSON
 aedes.on('publish', async function (packet, client) {
+    console.log('on publish = = = = = = = = = = = = ')
+    console.log(packet)
+    return
+    // console.log(client)
+
+    // let client_counterpart = new aedes.Client()
+    // client_array
 
     try {
         // console.log("packet.topic.toString()")
@@ -118,6 +132,7 @@ aedes.on('publish', async function (packet, client) {
 // Get all the data from that device
 express_server.get('/sensor_data/:device_name', (req, res) => {
     console.log("MongoDB读取")
+
     // 
     let device_name = req.params.device_name
     console.log(device_name);
@@ -176,6 +191,17 @@ express_server.get('/sensor_data/:device_name', (req, res) => {
 
     })
 
+})
+
+
+// A dynamic API that does all the payload sends
+express_server.get('/test/:topic/:payload', (req, res) => {
+    let topic = req.params.topic;
+    let payload = req.params.payload;
+    let msg_publish = { topic: topic, payload: payload };
+
+    aedes.publish(msg_publish)
+    res.end();
 })
 
 
